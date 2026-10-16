@@ -88,7 +88,27 @@ skyras-tv/
 
 ---
 
-## 4. Security, Clean-Room & Licensing Verification
+## 4. Viewer-First Cable TV UI Hierarchy (TiviMate-Grade Experience)
+
+Rather than resembling a multi-window web dashboard, SKYRAS TV employs a **viewer-first 10-foot television interface**:
+1. **Fullscreen Video Dominance**: Live video fills the screen from initial cold launch. Video playback never halts during menu or guide navigation.
+2. **Overlay Channel List (OK / Select)**: Pressing Enter/OK brings up a left-anchored translucent channel panel showing channel numbers, logos, now-playing titles, and progress bars directly over the running broadcast.
+3. **Cable-Box Channel Zapping**:
+   - Number pad direct tuning (`0-9`) with top-right OSD channel banner.
+   - Channel Up (`▲ CH+`) and Channel Down (`▼ CH-`) zapping with instant tune-in.
+   - Previous Channel recall (`L / PREV`) for fast back-and-forth toggling between two live events.
+4. **Automated Info Banner**: Appears on every channel change at the bottom screen edge displaying now/next airings, times, and playback progress, automatically auto-hiding after 4.5 seconds.
+5. **Centerpiece EPG Grid Guide with PIP Live Preview**:
+   - Fullscreen electronic program guide with small live video preview in the top-left corner.
+   - Program detail strip alongside the PIP preview showing comprehensive metadata.
+   - 4-column timeline matrix across time and channel rows down.
+6. **Secondary Drawer for Modular Features**:
+   - Menu key (`M`) pulls in a slim side rail for secondary items (Settings, Sports Picks, Community).
+   - AI Assist panel operates as a non-intrusive floating modal on the right edge over live video.
+
+---
+
+## 5. Security, Clean-Room & Licensing Verification
 
 - **100% Original Implementation**: All parser logic, D-pad traversal state machines, Xtream DTOs, and AI reasoning algorithms were written cleanly from scratch. No reverse-engineered or decompiled code from TVMate or other proprietary applications was used.
 - **Dependency Hygiene**: Only Apache-2.0 and MIT licensed open-source libraries are used (Kotlin stdlib, kotlinx-coroutines, kotlinx-serialization, OkHttp, JUnit 5). Full inventory documented in `LICENSES.md`.

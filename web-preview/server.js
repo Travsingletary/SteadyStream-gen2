@@ -12,6 +12,7 @@ const PORT = 43128;
 let channels = [
   {
     id: "skyras_sports_1",
+    channelNumber: 101,
     name: "SKYRAS Sports 1 HD",
     streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
     logoUrl: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=128&auto=format&fit=crop&q=80",
@@ -19,10 +20,15 @@ let channels = [
     epgChannelId: "skyras.sports1",
     isFavorite: true,
     nowPlaying: "NBA Championship Replay: Lakers vs Celtics",
+    nowTime: "18:00 - 20:30",
+    nowProgress: 65,
+    nextProgram: "Sports Center Live: Post-Game Analysis",
+    nextTime: "20:30 - 21:30",
     type: "LIVE"
   },
   {
     id: "skyras_news_24",
+    channelNumber: 102,
     name: "SKYRAS 24/7 Global News",
     streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     logoUrl: "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=128&auto=format&fit=crop&q=80",
@@ -30,28 +36,42 @@ let channels = [
     epgChannelId: "skyras.news24",
     isFavorite: false,
     nowPlaying: "Global Markets & Tech Wire Special",
+    nowTime: "19:00 - 20:00",
+    nowProgress: 40,
+    nextProgram: "Prime Evening World News Report",
+    nextTime: "20:00 - 21:00",
     type: "LIVE"
   },
   {
     id: "skyras_cinema_1",
+    channelNumber: 103,
     name: "SKYRAS Premiere Cinema",
     streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
     logoUrl: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=128&auto=format&fit=crop&q=80",
     categoryName: "Movies",
     epgChannelId: "skyras.cinema1",
     isFavorite: true,
-    nowPlaying: "Original Cinema: Sci-Fi Odyssey",
+    nowPlaying: "Original Cinema: Sci-Fi Odyssey (2026)",
+    nowTime: "18:30 - 21:00",
+    nowProgress: 52,
+    nextProgram: "Action Showcase: Midnight Pursuit",
+    nextTime: "21:00 - 23:15",
     type: "LIVE"
   },
   {
     id: "skyras_vod_doc",
-    name: "VOD: The Rise of Autonomous Systems",
+    channelNumber: 104,
+    name: "VOD: Autonomous Systems",
     streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     logoUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=128&auto=format&fit=crop&q=80",
     categoryName: "Documentary",
     epgChannelId: null,
     isFavorite: false,
-    nowPlaying: "Runtime: 12m 14s | 4K HDR",
+    nowPlaying: "Feature: Autonomous Neural Networks",
+    nowTime: "On Demand",
+    nowProgress: 15,
+    nextProgram: "Behind the Tech: Ep. 2",
+    nextTime: "Next Up",
     type: "VOD"
   }
 ];
@@ -88,12 +108,17 @@ function parseM3uText(text) {
     } else if (line.length > 0 && !line.startsWith('#')) {
       parsed.push({
         id: curExt?.['tvg-id'] || `ch_${parsed.length + 1}`,
+        channelNumber: parsed.length + 101,
         name: curExt?.name || curExt?.['tvg-name'] || `Channel ${parsed.length + 1}`,
         streamUrl: line,
         logoUrl: curExt?.['tvg-logo'] || null,
         categoryName: curExt?.['group-title'] || 'General',
         isFavorite: false,
-        nowPlaying: "Live Stream",
+        nowPlaying: "Live Broadcast",
+        nowTime: "Live",
+        nowProgress: 50,
+        nextProgram: "Upcoming Program",
+        nextTime: "Next",
         type: line.endsWith('.mp4') ? "VOD" : "LIVE"
       });
       curExt = null;
