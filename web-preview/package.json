@@ -1,0 +1,11 @@
+{
+  "name": "skyras-tv-companion",
+  "version": "1.0.0",
+  "description": "SKYRAS TV - Web Companion & D-Pad Remote Simulator",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "dependencies": {}
+}

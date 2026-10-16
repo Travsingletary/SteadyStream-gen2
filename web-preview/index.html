@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKYRAS TV - Next-Gen IPTV Player</title>
+  <!-- Tailwind CSS via CDN (MIT compatible) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- HLS.js for web-based live playback preview (Apache-2.0) -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    body {
+      background-color: #0b0f19;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow-x: hidden;
+    }
+    .tv-focus:focus, .tv-focus.focused {
+      outline: 3px solid #38bdf8;
+      outline-offset: 2px;
+      transform: scale(1.02);
+      transition: all 0.15s ease-in-out;
+      background-color: #1e293b;
+    }
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="flex flex-col h-screen select-none">
+
+  <!-- Top App Bar -->
+  <header class="flex items-center justify-between px-6 py-3 bg-slate-900/90 border-b border-slate-800">
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-black text-white text-lg tracking-wider shadow-lg shadow-cyan-500/30">
+        S
+      </div>
+      <div>
+        <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+          SKYRAS <span class="text-cyan-400">TV</span>
+          <span class="text-xs px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800/60 font-mono">100% ORIGINAL</span>
+        </h1>
+        <p class="text-xs text-slate-400">Owner: Travis Singletary | Android TV / Fire TV Media3 Core</p>
+      </div>
+    </div>
+
+    <!-- D-Pad Remote Instructions Banner -->
+    <div class="hidden md:flex items-center space-x-4 bg-slate-800/80 px-4 py-1.5 rounded-full text-xs text-slate-300 border border-slate-700">
+      <span class="flex items-center gap-1 font-mono font-medium text-cyan-300">
+        <kbd class="px-1.5 py-0.5 bg-slate-700 rounded text-[10px]">▲</kbd>
+        <kbd class="px-1.5 py-0.5 bg-slate-700 rounded text-[10px]">▼</kbd>
+        Navigate
+      </span>
+      <span class="text-slate-600">•</span>
+      <span class="flex items-center gap-1 font-mono font-medium text-cyan-300">
+        <kbd class="px-1.5 py-0.5 bg-slate-700 rounded text-[10px]">ENTER</kbd>
+        Play / Select
+      </span>
+      <span class="text-slate-600">•</span>
+      <span class="flex items-center gap-1 font-mono font-medium text-cyan-300">
+        <kbd class="px-1.5 py-0.5 bg-slate-700 rounded text-[10px]">F</kbd>
+        Favorite
+      </span>
+    </div>
+
+    <!-- Live Status -->
+    <div class="flex items-center space-x-3">
+      <div id="playback-status-badge" class="flex items-center gap-2 text-xs px-3 py-1 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/60">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="player-state-text">Ready</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main TV Interface Layout -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- TV Left Navigation Rail (10-foot D-Pad focused) -->
+    <nav id="nav-rail" class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between p-3 select-none">
+      <div class="space-y-1">
+        <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-2">Navigation</div>
+        
+        <button onclick="switchTab('live')" id="tab-btn-live" class="nav-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white bg-slate-800 tv-focus">
+          <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          Live TV
+        </button>
+
+        <button onclick="switchTab('favorites')" id="tab-btn-favorites" class="nav-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800/60 tv-focus">
+          <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          Favorites
+        </button>
+
+        <button onclick="switchTab('ai')" id="tab-btn-ai" class="nav-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-cyan-300 bg-cyan-950/40 border border-cyan-800/40 hover:bg-cyan-900/40 tv-focus">
+          <svg class="w-5 h-5 text-cyan-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <span>AI Assist Panel</span>
+        </button>
+
+        <!-- Feature 2: Sports Picks / Bet slot (Feature flagged) -->
+        <button onclick="switchTab('sports-picks')" id="tab-btn-sports-picks" class="nav-tab w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800/60 tv-focus">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Sports Picks / Bet</span>
+          </div>
+          <span id="sports-picks-flag-pill" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">FLAGGED</span>
+        </button>
+
+        <!-- Feature 3: Community slot (Placeholder for Discord/etc.) -->
+        <button onclick="switchTab('community')" id="tab-btn-community" class="nav-tab w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800/60 tv-focus">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <span>Community</span>
+          </div>
+          <span id="community-flag-pill" class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-400 border border-indigo-800/60">ACTIVE</span>
+        </button>
+
+        <button onclick="switchTab('settings')" id="tab-btn-settings" class="nav-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800/60 tv-focus">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Settings & Import
+        </button>
+      </div>
+
+      <!-- Quick Xtream & M3U Status -->
+      <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 text-xs text-slate-400 space-y-1">
+        <div class="text-[10px] uppercase font-bold text-slate-500">Local Source</div>
+        <div class="text-white font-medium truncate" id="active-source-name">SKYRAS Demo Lineup</div>
+        <div class="flex items-center gap-1.5 text-[11px] text-emerald-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          Mock Xtream Active
+        </div>
+      </div>
+    </nav>
+
+    <!-- Center Player & Channel List Area -->
+    <main class="flex-1 flex flex-col bg-slate-950 overflow-hidden">
+
+      <!-- Tab: Live TV & Channels -->
+      <div id="section-live" class="tab-content flex-1 flex flex-col md:flex-row overflow-hidden">
+        
+        <!-- Channels & Categories Sidebar -->
+        <div class="w-full md:w-80 bg-slate-900/60 border-r border-slate-800 flex flex-col">
+          <div class="p-4 border-b border-slate-800">
+            <input type="text" id="channel-search-input" placeholder="Search channels..." oninput="handleSearch(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 tv-focus">
+          </div>
+
+          <!-- Channel List -->
+          <div id="channel-list" class="flex-1 overflow-y-auto scrollbar-thin p-2 space-y-1">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Video Player Viewport -->
+        <div class="flex-1 flex flex-col bg-black relative justify-center items-center">
+          <video id="video-player" class="w-full h-full object-contain" controls autoplay playsinline></video>
+
+          <!-- On-Screen TV OSD (Channel info overlay) -->
+          <div id="player-osd" class="absolute bottom-6 left-6 right-6 bg-slate-950/80 backdrop-blur-md border border-slate-700/60 p-4 rounded-xl flex items-center justify-between pointer-events-none transition-opacity duration-300">
+            <div>
+              <div class="text-xs text-cyan-400 font-semibold uppercase tracking-wider" id="osd-channel-category">Sports</div>
+              <div class="text-xl font-bold text-white flex items-center gap-2" id="osd-channel-name">
+                SKYRAS Sports 1 HD
+              </div>
+              <div class="text-sm text-slate-300 mt-0.5" id="osd-now-playing">
+                Now Playing: NBA Championship Replay
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs px-2 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700 font-mono">1080p60</span>
+              <span class="text-xs px-2 py-1 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 font-mono">Media3 HLS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: AI Assist Panel (Feature 1) -->
+      <div id="section-ai" class="tab-content hidden flex-1 flex flex-col p-6 max-w-4xl mx-auto w-full overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+              <span class="text-cyan-400">✦</span> SKYRAS AI Assist
+            </h2>
+            <p class="text-sm text-slate-400">Natural-language discovery for live sports, airings, and personalized recommendations.</p>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-mono bg-cyan-950 text-cyan-300 border border-cyan-800/60">
+            Provider: <span id="ai-provider-badge">Mock Offline LLM</span>
+          </span>
+        </div>
+
+        <!-- Chat / Query Interface -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col flex-1 min-h-[420px]">
+          <div id="ai-chat-history" class="flex-1 overflow-y-auto space-y-4 mb-4 p-2 scrollbar-thin">
+            <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700/60">
+              <p class="text-sm text-cyan-300 font-semibold mb-1">SKYRAS AI:</p>
+              <p class="text-sm text-slate-200">Hello Travis! What would you like to watch right now? Ask me "find me the game", "what's on right now?", or "recommend a movie".</p>
+            </div>
+          </div>
+
+          <!-- Suggested Quick Prompts -->
+          <div class="flex flex-wrap gap-2 mb-3">
+            <button onclick="askAi('find me the game')" class="text-xs bg-slate-800 hover:bg-slate-700 text-cyan-300 px-3 py-1.5 rounded-full border border-slate-700 tv-focus">
+              🏈 Find me the game
+            </button>
+            <button onclick="askAi('what is on right now?')" class="text-xs bg-slate-800 hover:bg-slate-700 text-cyan-300 px-3 py-1.5 rounded-full border border-slate-700 tv-focus">
+              📺 What's on right now?
+            </button>
+            <button onclick="askAi('recommend movies or vod')" class="text-xs bg-slate-800 hover:bg-slate-700 text-cyan-300 px-3 py-1.5 rounded-full border border-slate-700 tv-focus">
+              🎬 Recommend movies
+            </button>
+          </div>
+
+          <div class="flex gap-2">
+            <input type="text" id="ai-query-input" placeholder="Type prompt (e.g. 'find me the game')..." onkeydown="if(event.key==='Enter') executeAiQuery()" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 tv-focus">
+            <button onclick="executeAiQuery()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-medium px-5 py-2.5 rounded-lg text-sm tv-focus">
+              Ask AI
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Feature 2 - Sports Picks / Bet Affiliate Slot -->
+      <div id="section-sports-picks" class="tab-content hidden flex-1 p-8 max-w-4xl mx-auto w-full overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+            <div>
+              <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                <span class="text-emerald-400">⚽</span> Sports Picks / Affiliate Partner Slot
+              </h2>
+              <p class="text-sm text-slate-400">Licensed Sportsbook External Referral Stub (No Wagering Logic in App)</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="text-xs text-slate-400">Feature Flag:</label>
+              <button id="sports-flag-toggle" onclick="toggleSportsPicksFlag()" class="px-3 py-1 rounded text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                OFF
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-6 space-y-4">
+            <div class="p-4 rounded-xl bg-amber-950/40 border border-amber-800/60 text-amber-300 text-xs leading-relaxed">
+              <strong>STRICT COMPLIANCE & LEGAL NOTICE:</strong><br>
+              • 100% NO real-money wagering logic is built into SKYRAS TV.<br>
+              • This module is an external affiliate referral stub only (e.g., DraftKings, FanDuel).<br>
+              • <strong>TODO FOR PRODUCTION:</strong> Integrate Geo-fencing verification (e.g. GeoComply) and 21+ Age Gate modal before enabling outbound clicks.
+            </div>
+
+            <div id="sports-content-container" class="opacity-50 pointer-events-none transition-all">
+              <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">Licensed Sportsbook Offers</h3>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 flex flex-col justify-between">
+                  <div>
+                    <div class="text-lg font-bold text-white">DraftKings Sportsbook</div>
+                    <p class="text-xs text-slate-400 mt-1">Official Licensed Partner Offer. View live game odds on DraftKings.</p>
+                  </div>
+                  <div class="mt-4 pt-4 border-t border-slate-900">
+                    <button onclick="testAffiliateLink('draftkings')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 rounded-lg text-xs tv-focus">
+                      External Link: DraftKings [Affiliate Linkout]
+                    </button>
+                    <p class="text-[10px] text-slate-500 mt-2">21+ only. Call 1-800-GAMBLER.</p>
+                  </div>
+                </div>
+
+                <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 flex flex-col justify-between">
+                  <div>
+                    <div class="text-lg font-bold text-white">FanDuel Sportsbook</div>
+                    <p class="text-xs text-slate-400 mt-1">Official Licensed Partner Offer. External linkout only.</p>
+                  </div>
+                  <div class="mt-4 pt-4 border-t border-slate-900">
+                    <button onclick="testAffiliateLink('fanduel')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 rounded-lg text-xs tv-focus">
+                      External Link: FanDuel [Affiliate Linkout]
+                    </button>
+                    <p class="text-[10px] text-slate-500 mt-2">21+ only. Regulated US states.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Feature 3 - Community Slot (Configurable URL & Feature Flag) -->
+      <div id="section-community" class="tab-content hidden flex-1 p-8 max-w-4xl mx-auto w-full overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+            <div>
+              <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                <span class="text-indigo-400">👥</span> SKYRAS Media Community
+              </h2>
+              <p class="text-sm text-slate-400">Viewer hub for discussions, watch-parties, and feature requests.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="text-xs text-slate-400">Feature Flag:</label>
+              <button id="community-flag-toggle" onclick="toggleCommunityFlag()" class="px-3 py-1 rounded text-xs font-bold bg-indigo-900 text-indigo-300 border border-indigo-700">
+                ACTIVE
+              </button>
+            </div>
+          </div>
+
+          <div id="community-view-area" class="mt-6 flex flex-col items-center text-center p-8 bg-slate-950 rounded-xl border border-slate-800">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-950/80 border border-indigo-800/80 flex items-center justify-center text-indigo-400 mb-4">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2" id="community-title-text">Join the Official SKYRAS Discord</h3>
+            <p class="text-sm text-slate-400 max-w-md mb-6" id="community-desc-text">
+              Connect with fellow SKYRAS TV viewers, discuss live sports broadcasts, participate in community polls, and request new features directly from Travis.
+            </p>
+
+            <div class="p-4 bg-slate-900 rounded-lg border border-slate-800 max-w-md w-full mb-6">
+              <div class="text-xs text-slate-500 font-mono mb-1">CONFIGURED DESTINATION URL:</div>
+              <div class="text-sm text-cyan-400 font-mono break-all" id="community-target-url-display">https://discord.gg/skyras</div>
+            </div>
+
+            <div class="flex gap-3">
+              <a id="community-open-link" href="https://discord.gg/skyras" target="_blank" rel="noopener noreferrer" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-6 py-2.5 rounded-lg text-sm tv-focus">
+                Open Community Link
+              </a>
+              <button onclick="promptEditCommunityUrl()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2.5 rounded-lg text-sm tv-focus">
+                Configure URL
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Settings & Import -->
+      <div id="section-settings" class="tab-content hidden flex-1 p-8 max-w-4xl mx-auto w-full overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+          <h2 class="text-2xl font-bold text-white">Settings & Playlist Import</h2>
+
+          <!-- M3U Import Form -->
+          <div class="p-5 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
+            <h3 class="text-md font-semibold text-white">Import M3U / M3U8 Playlist</h3>
+            <textarea id="m3u-import-text" rows="4" placeholder="#EXTM3U&#10;#EXTINF:-1 tvg-id=&quot;espn&quot; group-title=&quot;Sports&quot;,ESPN HD&#10;https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs font-mono text-white focus:outline-none focus:border-cyan-500 tv-focus"></textarea>
+            <button onclick="importM3u()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-medium px-4 py-2 rounded-lg text-xs tv-focus">
+              Parse & Load M3U
+            </button>
+          </div>
+
+          <!-- Xtream Login Form -->
+          <div class="p-5 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
+            <h3 class="text-md font-semibold text-white">Xtream Codes Credentials (Server, User, Pass)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <input type="text" id="xtream-server" value="http://127.0.0.1:43128" placeholder="http://server.com:8080" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white tv-focus">
+              <input type="text" id="xtream-user" value="travis_singletary" placeholder="Username" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white tv-focus">
+              <input type="password" id="xtream-pass" value="password123" placeholder="Password" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white tv-focus">
+            </div>
+            <button onclick="loginXtream()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-medium px-4 py-2 rounded-lg text-xs tv-focus">
+              Connect to Xtream API
+            </button>
+          </div>
+
+          <!-- AI Provider Settings -->
+          <div class="p-5 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
+            <h3 class="text-md font-semibold text-white">AI Assist Provider Configuration</h3>
+            <p class="text-xs text-slate-400">Pluggable backend: Use the built-in offline mock or configure any OpenAI-compatible endpoint (OpenAI, Ollama, Groq, LocalAI). No keys are committed.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="text-[11px] text-slate-400">Endpoint Base URL</label>
+                <input type="text" id="ai-endpoint-url" value="https://api.openai.com/v1" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white tv-focus">
+              </div>
+              <div>
+                <label class="text-[11px] text-slate-400">Model Name</label>
+                <input type="text" id="ai-model-name" value="gpt-4o-mini" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white tv-focus">
+              </div>
+            </div>
+            <button onclick="saveAiSettings()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium px-4 py-2 rounded-lg text-xs tv-focus">
+              Save AI Settings
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let channels = [];
+    let focusedIndex = 0;
+    let currentChannel = null;
+    let hls = null;
+    let sportsPicksEnabled = false;
+    let communityEnabled = true;
+
+    async function init() {
+      await fetchChannels();
+      await fetchConfig();
+      setupDpadKeyboardListener();
+    }
+
+    async function fetchChannels() {
+      try {
+        const res = await fetch('/api/channels');
+        channels = await res.json();
+        renderChannelList(channels);
+        if (channels.length > 0 && !currentChannel) {
+          playChannel(channels[0]);
+        }
+      } catch (e) {
+        console.error("Failed to load channels", e);
+      }
+    }
+
+    async function fetchConfig() {
+      try {
+        const res = await fetch('/api/config');
+        const cfg = await res.json();
+        sportsPicksEnabled = cfg.sportsPicksEnabled;
+        communityEnabled = cfg.communityEnabled;
+        updateFlagUI();
+        if (cfg.communityUrl) {
+          document.getElementById('community-target-url-display').textContent = cfg.communityUrl;
+          document.getElementById('community-open-link').href = cfg.communityUrl;
+        }
+      } catch (e) {
+        console.error("Failed to load config", e);
+      }
+    }
+
+    function updateFlagUI() {
+      const spBtn = document.getElementById('sports-flag-toggle');
+      const spPill = document.getElementById('sports-picks-flag-pill');
+      const spContainer = document.getElementById('sports-content-container');
+      if (sportsPicksEnabled) {
+        spBtn.textContent = 'ACTIVE';
+        spBtn.className = 'px-3 py-1 rounded text-xs font-bold bg-emerald-900 text-emerald-300 border border-emerald-700';
+        spPill.textContent = 'ACTIVE';
+        spPill.className = 'text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/60';
+        spContainer.classList.remove('opacity-50', 'pointer-events-none');
+      } else {
+        spBtn.textContent = 'OFF';
+        spBtn.className = 'px-3 py-1 rounded text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700';
+        spPill.textContent = 'FLAGGED';
+        spPill.className = 'text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700';
+        spContainer.classList.add('opacity-50', 'pointer-events-none');
+      }
+
+      const comBtn = document.getElementById('community-flag-toggle');
+      const comPill = document.getElementById('community-flag-pill');
+      const comArea = document.getElementById('community-view-area');
+      if (communityEnabled) {
+        comBtn.textContent = 'ACTIVE';
+        comBtn.className = 'px-3 py-1 rounded text-xs font-bold bg-indigo-900 text-indigo-300 border border-indigo-700';
+        comPill.textContent = 'ACTIVE';
+        comPill.className = 'text-[10px] px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-400 border border-indigo-800/60';
+        comArea.classList.remove('opacity-50', 'pointer-events-none');
+      } else {
+        comBtn.textContent = 'OFF';
+        comBtn.className = 'px-3 py-1 rounded text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700';
+        comPill.textContent = 'FLAGGED';
+        comPill.className = 'text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700';
+        comArea.classList.add('opacity-50', 'pointer-events-none');
+      }
+    }
+
+    function renderChannelList(list) {
+      const container = document.getElementById('channel-list');
+      container.innerHTML = '';
+
+      list.forEach((ch, idx) => {
+        const item = document.createElement('div');
+        item.className = `p-3 rounded-lg flex items-center justify-between cursor-pointer border border-transparent tv-focus ${idx === focusedIndex ? 'focused bg-slate-800 border-slate-700' : 'hover:bg-slate-800/40'}`;
+        item.tabIndex = 0;
+        item.dataset.index = idx;
+
+        item.innerHTML = `
+          <div class="flex items-center space-x-3 truncate">
+            <div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center font-bold text-xs text-slate-300 overflow-hidden flex-shrink-0">
+              ${ch.logoUrl ? `<img src="${ch.logoUrl}" class="w-full h-full object-cover">` : (idx + 1)}
+            </div>
+            <div class="truncate">
+              <div class="text-sm font-medium text-white truncate">${ch.name}</div>
+              <div class="text-xs text-slate-400 truncate">${ch.nowPlaying || ch.categoryName}</div>
+            </div>
+          </div>
+          <button onclick="event.stopPropagation(); toggleFavorite('${ch.id}')" class="p-1 hover:text-amber-400 ${ch.isFavorite ? 'text-amber-400' : 'text-slate-600'}">
+            ★
+          </button>
+        `;
+
+        item.onclick = () => {
+          focusedIndex = idx;
+          updateFocusUI();
+          playChannel(ch);
+        };
+
+        container.appendChild(item);
+      });
+    }
+
+    function updateFocusUI() {
+      const items = document.querySelectorAll('#channel-list > div');
+      items.forEach((el, idx) => {
+        if (idx === focusedIndex) {
+          el.classList.add('focused', 'bg-slate-800', 'border-slate-700');
+          el.scrollIntoView({ block: 'nearest' });
+        } else {
+          el.classList.remove('focused', 'bg-slate-800', 'border-slate-700');
+        }
+      });
+    }
+
+    function playChannel(channel) {
+      currentChannel = channel;
+      document.getElementById('osd-channel-name').textContent = channel.name;
+      document.getElementById('osd-channel-category').textContent = channel.categoryName;
+      document.getElementById('osd-now-playing').textContent = `Now Playing: ${channel.nowPlaying || "Live Stream"}`;
+      document.getElementById('player-state-text').textContent = `Playing: ${channel.name}`;
+
+      const video = document.getElementById('video-player');
+
+      if (channel.streamUrl.includes('.m3u8')) {
+        if (Hls.isSupported()) {
+          if (hls) hls.destroy();
+          hls = new Hls();
+          hls.loadSource(channel.streamUrl);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = channel.streamUrl;
+          video.play().catch(() => {});
+        }
+      } else {
+        if (hls) { hls.destroy(); hls = null; }
+        video.src = channel.streamUrl;
+        video.play().catch(() => {});
+      }
+    }
+
+    async function toggleFavorite(channelId) {
+      const res = await fetch('/api/channels/favorite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ channelId })
+      });
+      const data = await res.json();
+      channels = data.channels;
+      renderChannelList(channels);
+    }
+
+    function handleSearch(q) {
+      const filtered = channels.filter(c => c.name.toLowerCase().includes(q.toLowerCase()) || c.categoryName.toLowerCase().includes(q.toLowerCase()));
+      renderChannelList(filtered);
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('bg-slate-800', 'text-white'));
+      
+      const targetSec = document.getElementById(`section-${tabId}`);
+      if (targetSec) targetSec.classList.remove('hidden');
+
+      const targetBtn = document.getElementById(`tab-btn-${tabId}`);
+      if (targetBtn) targetBtn.classList.add('bg-slate-800', 'text-white');
+    }
+
+    // D-Pad Keyboard Controller (Arrow keys, Enter, Back)
+    function setupDpadKeyboardListener() {
+      window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (focusedIndex < channels.length - 1) {
+            focusedIndex++;
+            updateFocusUI();
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (focusedIndex > 0) {
+            focusedIndex--;
+            updateFocusUI();
+          }
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (channels[focusedIndex]) {
+            playChannel(channels[focusedIndex]);
+          }
+        } else if (e.key === 'f' || e.key === 'F') {
+          e.preventDefault();
+          if (channels[focusedIndex]) {
+            toggleFavorite(channels[focusedIndex].id);
+          }
+        }
+      });
+    }
+
+    // AI Assist Panel
+    async function executeAiQuery() {
+      const input = document.getElementById('ai-query-input');
+      const q = input.value.trim();
+      if (!q) return;
+      input.value = '';
+      askAi(q);
+    }
+
+    async function askAi(query) {
+      const history = document.getElementById('ai-chat-history');
+      
+      // User message
+      const userBubble = document.createElement('div');
+      userBubble.className = "bg-cyan-950/40 p-3 rounded-xl border border-cyan-800/40 text-sm text-cyan-200";
+      userBubble.innerHTML = `<span class="font-semibold text-cyan-400">You:</span> ${query}`;
+      history.appendChild(userBubble);
+      history.scrollTop = history.scrollHeight;
+
+      try {
+        const res = await fetch('/api/ai-assist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+        const data = await res.json();
+
+        // Bot message
+        const botBubble = document.createElement('div');
+        botBubble.className = "bg-slate-800/80 p-4 rounded-xl border border-slate-700/60 text-sm space-y-2";
+        
+        let matchesHtml = '';
+        if (data.matchedChannels && data.matchedChannels.length > 0) {
+          matchesHtml = `
+            <div class="mt-3 pt-3 border-t border-slate-700">
+              <div class="text-xs font-semibold text-cyan-400 uppercase tracking-wider mb-2">Matched Channels:</div>
+              <div class="flex flex-wrap gap-2">
+                ${data.matchedChannels.map(c => `
+                  <button onclick="playChannelById('${c.id}')" class="bg-slate-900 hover:bg-slate-950 text-white border border-slate-700 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 tv-focus">
+                    ▶ <span>${c.name}</span>
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        botBubble.innerHTML = `
+          <p class="text-cyan-300 font-semibold">SKYRAS AI:</p>
+          <p class="text-slate-200">${data.reply}</p>
+          ${matchesHtml}
+        `;
+        history.appendChild(botBubble);
+        history.scrollTop = history.scrollHeight;
+      } catch (e) {
+        console.error("AI error", e);
+      }
+    }
+
+    function playChannelById(id) {
+      const ch = channels.find(c => c.id === id);
+      if (ch) {
+        switchTab('live');
+        playChannel(ch);
+      }
+    }
+
+    // Toggle Feature Flags
+    async function toggleSportsPicksFlag() {
+      sportsPicksEnabled = !sportsPicksEnabled;
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sportsPicksEnabled })
+      });
+      updateFlagUI();
+    }
+
+    async function toggleCommunityFlag() {
+      communityEnabled = !communityEnabled;
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ communityEnabled })
+      });
+      updateFlagUI();
+    }
+
+    function promptEditCommunityUrl() {
+      const current = document.getElementById('community-target-url-display').textContent;
+      const newUrl = prompt("Enter Community Discord / Target URL:", current);
+      if (newUrl && newUrl.trim()) {
+        fetch('/api/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ communityUrl: newUrl.trim() })
+        }).then(() => {
+          document.getElementById('community-target-url-display').textContent = newUrl.trim();
+          document.getElementById('community-open-link').href = newUrl.trim();
+        });
+      }
+    }
+
+    function testAffiliateLink(partner) {
+      if (!sportsPicksEnabled) {
+        alert("Feature Flag is OFF. Enable the feature flag to test outbound affiliate clicks.");
+        return;
+      }
+      alert(`Outbound affiliate redirect stub: Opening regulated partner (${partner}) with tag 'skyras_media'. Note: 21+ age-gate and geofence TODO required before production.`);
+    }
+
+    async function importM3u() {
+      const text = document.getElementById('m3u-import-text').value.trim();
+      if (!text) return;
+      const res = await fetch('/api/import/m3u', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: text
+      });
+      const data = await res.json();
+      channels = data.channels;
+      renderChannelList(channels);
+      switchTab('live');
+      alert(`Imported ${data.count} channels successfully!`);
+    }
+
+    function loginXtream() {
+      alert("Authenticated with Mock Xtream Codes API! Synced live categories and live streams.");
+      fetchChannels();
+      switchTab('live');
+    }
+
+    init();
+  </script>
+</body>
+</html>
