@@ -54,6 +54,8 @@
       <span class="flex items-center gap-1 font-mono font-medium text-cyan-300">
         <kbd class="px-1.5 py-0.5 bg-slate-700 rounded text-[10px]">▲</kbd>
         <kbd class="px-1.5 py-0.5 bg-slate-700 rounded text-[10px]">▼</kbd>
+        <kbd class="px-1.5 py-0.5 bg-slate-700 rounded text-[10px]">◀</kbd>
+        <kbd class="px-1.5 py-0.5 bg-slate-700 rounded text-[10px]">▶</kbd>
         Navigate
       </span>
       <span class="text-slate-600">•</span>
@@ -70,8 +72,8 @@
 
     <!-- Live Status -->
     <div class="flex items-center space-x-3">
-      <div id="playback-status-badge" class="flex items-center gap-2 text-xs px-3 py-1 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-800/60">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <div id="playback-status-badge" class="flex items-center gap-2 text-xs px-3 py-1 rounded-full bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 font-mono">
+        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
         <span id="player-state-text">Ready</span>
       </div>
     </div>
@@ -95,27 +97,27 @@
           Favorites
         </button>
 
-        <button onclick="switchTab('ai')" id="tab-btn-ai" class="nav-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-cyan-300 bg-cyan-950/40 border border-cyan-800/40 hover:bg-cyan-900/40 tv-focus">
-          <svg class="w-5 h-5 text-cyan-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        <button onclick="switchTab('ai')" id="tab-btn-ai" class="nav-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800/60 tv-focus">
+          <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           <span>AI Assist Panel</span>
         </button>
 
         <!-- Feature 2: Sports Picks / Bet slot (Feature flagged) -->
         <button onclick="switchTab('sports-picks')" id="tab-btn-sports-picks" class="nav-tab w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800/60 tv-focus">
           <div class="flex items-center gap-3">
-            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <span>Sports Picks / Bet</span>
           </div>
-          <span id="sports-picks-flag-pill" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">FLAGGED</span>
+          <span id="sports-picks-flag-pill" class="text-[10px] px-1.5 py-0.5 rounded font-mono bg-slate-800 text-slate-400 border border-slate-700">FLAGGED</span>
         </button>
 
         <!-- Feature 3: Community slot (Placeholder for Discord/etc.) -->
         <button onclick="switchTab('community')" id="tab-btn-community" class="nav-tab w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800/60 tv-focus">
           <div class="flex items-center gap-3">
-            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             <span>Community</span>
           </div>
-          <span id="community-flag-pill" class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-400 border border-indigo-800/60">ACTIVE</span>
+          <span id="community-flag-pill" class="text-[10px] px-1.5 py-0.5 rounded font-mono bg-cyan-950 text-cyan-400 border border-cyan-800/60">ACTIVE</span>
         </button>
 
         <button onclick="switchTab('settings')" id="tab-btn-settings" class="nav-tab w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800/60 tv-focus">
@@ -128,8 +130,8 @@
       <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 text-xs text-slate-400 space-y-1">
         <div class="text-[10px] uppercase font-bold text-slate-500">Local Source</div>
         <div class="text-white font-medium truncate" id="active-source-name">SKYRAS Demo Lineup</div>
-        <div class="flex items-center gap-1.5 text-[11px] text-emerald-400">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        <div class="flex items-center gap-1.5 text-[11px] text-cyan-400 font-mono">
+          <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
           Mock Xtream Active
         </div>
       </div>
@@ -213,7 +215,7 @@
           </div>
 
           <div class="flex gap-2">
-            <input type="text" id="ai-query-input" placeholder="Type prompt (e.g. 'find me the game')..." onkeydown="if(event.key==='Enter') executeAiQuery()" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 tv-focus">
+            <input type="text" id="ai-query-input" placeholder="Type prompt (e.g. 'what\'s on right now')..." onkeydown="if(event.key==='Enter') executeAiQuery()" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 tv-focus">
             <button onclick="executeAiQuery()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-medium px-5 py-2.5 rounded-lg text-sm tv-focus">
               Ask AI
             </button>
@@ -222,58 +224,65 @@
       </div>
 
       <!-- Tab: Feature 2 - Sports Picks / Bet Affiliate Slot -->
-      <div id="section-sports-picks" class="tab-content hidden flex-1 p-8 max-w-4xl mx-auto w-full overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+      <div id="section-sports-picks" class="tab-content hidden flex-1 p-6 max-w-4xl mx-auto w-full overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
           <div class="flex items-center justify-between pb-4 border-b border-slate-800">
             <div>
-              <h2 class="text-2xl font-bold text-white flex items-center gap-2">
-                <span class="text-emerald-400">⚽</span> Sports Picks / Affiliate Partner Slot
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <span class="text-cyan-400">✦</span> Sports Picks & Affiliate Links
               </h2>
-              <p class="text-sm text-slate-400">Licensed Sportsbook External Referral Stub (No Wagering Logic in App)</p>
+              <p class="text-xs text-slate-400 mt-0.5">Licensed sportsbook partner referral stubs • Outbound linkout only</p>
             </div>
             <div class="flex items-center gap-2">
-              <label class="text-xs text-slate-400">Feature Flag:</label>
-              <button id="sports-flag-toggle" onclick="toggleSportsPicksFlag()" class="px-3 py-1 rounded text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700">
-                OFF
+              <span class="text-xs text-slate-400 font-medium">Feature Flag:</span>
+              <button id="sports-flag-toggle" onclick="toggleSportsPicksFlag()" class="px-3 py-1 rounded text-xs font-mono font-medium bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700 tv-focus">
+                DISABLED
               </button>
             </div>
           </div>
 
           <div class="mt-6 space-y-4">
-            <div class="p-4 rounded-xl bg-amber-950/40 border border-amber-800/60 text-amber-300 text-xs leading-relaxed">
-              <strong>STRICT COMPLIANCE & LEGAL NOTICE:</strong><br>
-              • 100% NO real-money wagering logic is built into SKYRAS TV.<br>
-              • This module is an external affiliate referral stub only (e.g., DraftKings, FanDuel).<br>
-              • <strong>TODO FOR PRODUCTION:</strong> Integrate Geo-fencing verification (e.g. GeoComply) and 21+ Age Gate modal before enabling outbound clicks.
+            <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 leading-relaxed">
+              <div class="flex items-center gap-2 text-cyan-400 font-semibold mb-1">
+                <span class="text-xs px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800/60 font-mono">COMPLIANCE NOTICE</span>
+                <span>Affiliate Model Only</span>
+              </div>
+              <p class="text-slate-400">Zero real-money wagering logic is built into SKYRAS TV. All offers link out to licensed sportsbook partner platforms. Geofence checking (GeoComply) and 21+ Age Gate verification required prior to production rollout.</p>
             </div>
 
             <div id="sports-content-container" class="opacity-50 pointer-events-none transition-all">
-              <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">Licensed Sportsbook Offers</h3>
+              <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Licensed Sportsbook Offers</div>
               
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 flex flex-col justify-between">
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-between tv-focus">
                   <div>
-                    <div class="text-lg font-bold text-white">DraftKings Sportsbook</div>
-                    <p class="text-xs text-slate-400 mt-1">Official Licensed Partner Offer. View live game odds on DraftKings.</p>
+                    <div class="flex items-center justify-between">
+                      <div class="text-base font-bold text-white">DraftKings Sportsbook</div>
+                      <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 font-mono">AFFILIATE</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1.5">Official licensed partner referral. View live game odds on DraftKings.</p>
                   </div>
-                  <div class="mt-4 pt-4 border-t border-slate-900">
-                    <button onclick="testAffiliateLink('draftkings')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 rounded-lg text-xs tv-focus">
-                      External Link: DraftKings [Affiliate Linkout]
+                  <div class="mt-4 pt-3 border-t border-slate-800/80">
+                    <button onclick="testAffiliateLink('draftkings')" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-medium py-2 rounded-lg text-xs tv-focus">
+                      External Link: DraftKings
                     </button>
-                    <p class="text-[10px] text-slate-500 mt-2">21+ only. Call 1-800-GAMBLER.</p>
+                    <p class="text-[10px] text-slate-500 font-mono mt-2">21+ only • Call 1-800-GAMBLER</p>
                   </div>
                 </div>
 
-                <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 flex flex-col justify-between">
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-between tv-focus">
                   <div>
-                    <div class="text-lg font-bold text-white">FanDuel Sportsbook</div>
-                    <p class="text-xs text-slate-400 mt-1">Official Licensed Partner Offer. External linkout only.</p>
+                    <div class="flex items-center justify-between">
+                      <div class="text-base font-bold text-white">FanDuel Sportsbook</div>
+                      <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 font-mono">AFFILIATE</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1.5">Official licensed partner referral. External referral linkout only.</p>
                   </div>
-                  <div class="mt-4 pt-4 border-t border-slate-900">
-                    <button onclick="testAffiliateLink('fanduel')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-2 rounded-lg text-xs tv-focus">
-                      External Link: FanDuel [Affiliate Linkout]
+                  <div class="mt-4 pt-3 border-t border-slate-800/80">
+                    <button onclick="testAffiliateLink('fanduel')" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-medium py-2 rounded-lg text-xs tv-focus">
+                      External Link: FanDuel
                     </button>
-                    <p class="text-[10px] text-slate-500 mt-2">21+ only. Regulated US states.</p>
+                    <p class="text-[10px] text-slate-500 font-mono mt-2">21+ only • Regulated US States</p>
                   </div>
                 </div>
               </div>
@@ -283,42 +292,42 @@
       </div>
 
       <!-- Tab: Feature 3 - Community Slot (Configurable URL & Feature Flag) -->
-      <div id="section-community" class="tab-content hidden flex-1 p-8 max-w-4xl mx-auto w-full overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+      <div id="section-community" class="tab-content hidden flex-1 p-6 max-w-4xl mx-auto w-full overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
           <div class="flex items-center justify-between pb-4 border-b border-slate-800">
             <div>
-              <h2 class="text-2xl font-bold text-white flex items-center gap-2">
-                <span class="text-indigo-400">👥</span> SKYRAS Media Community
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <span class="text-cyan-400">✦</span> Community Hub
               </h2>
-              <p class="text-sm text-slate-400">Viewer hub for discussions, watch-parties, and feature requests.</p>
+              <p class="text-xs text-slate-400 mt-0.5">Viewer discussion hub, watch-parties, and feature feedback</p>
             </div>
             <div class="flex items-center gap-2">
-              <label class="text-xs text-slate-400">Feature Flag:</label>
-              <button id="community-flag-toggle" onclick="toggleCommunityFlag()" class="px-3 py-1 rounded text-xs font-bold bg-indigo-900 text-indigo-300 border border-indigo-700">
+              <span class="text-xs text-slate-400 font-medium">Feature Flag:</span>
+              <button id="community-flag-toggle" onclick="toggleCommunityFlag()" class="px-3 py-1 rounded text-xs font-mono font-medium bg-cyan-950 text-cyan-300 border border-cyan-800/60 hover:bg-cyan-900/60 tv-focus">
                 ACTIVE
               </button>
             </div>
           </div>
 
-          <div id="community-view-area" class="mt-6 flex flex-col items-center text-center p-8 bg-slate-950 rounded-xl border border-slate-800">
-            <div class="w-16 h-16 rounded-2xl bg-indigo-950/80 border border-indigo-800/80 flex items-center justify-center text-indigo-400 mb-4">
-              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>
+          <div id="community-view-area" class="mt-6 flex flex-col items-center text-center p-6 bg-slate-950 rounded-xl border border-slate-800">
+            <div class="w-12 h-12 rounded-xl bg-slate-900 border border-slate-700/80 flex items-center justify-center text-cyan-400 mb-3">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             </div>
-            <h3 class="text-xl font-bold text-white mb-2" id="community-title-text">Join the Official SKYRAS Discord</h3>
-            <p class="text-sm text-slate-400 max-w-md mb-6" id="community-desc-text">
-              Connect with fellow SKYRAS TV viewers, discuss live sports broadcasts, participate in community polls, and request new features directly from Travis.
+            <h3 class="text-lg font-bold text-white mb-1.5" id="community-title-text">Official SKYRAS TV Community</h3>
+            <p class="text-xs text-slate-400 max-w-md mb-6 leading-relaxed" id="community-desc-text">
+              Connect with fellow SKYRAS TV viewers, discuss live broadcasts, participate in channel polls, and request new features directly from Travis.
             </p>
 
-            <div class="p-4 bg-slate-900 rounded-lg border border-slate-800 max-w-md w-full mb-6">
-              <div class="text-xs text-slate-500 font-mono mb-1">CONFIGURED DESTINATION URL:</div>
-              <div class="text-sm text-cyan-400 font-mono break-all" id="community-target-url-display">https://discord.gg/skyras</div>
+            <div class="p-3 bg-slate-900 rounded-lg border border-slate-800 max-w-md w-full mb-6 text-left">
+              <div class="text-[10px] text-slate-500 uppercase font-mono font-semibold">Configured Destination URL</div>
+              <div class="text-xs text-cyan-400 font-mono break-all mt-0.5" id="community-target-url-display">https://discord.gg/skyras</div>
             </div>
 
             <div class="flex gap-3">
-              <a id="community-open-link" href="https://discord.gg/skyras" target="_blank" rel="noopener noreferrer" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-6 py-2.5 rounded-lg text-sm tv-focus">
+              <a id="community-open-link" href="https://discord.gg/skyras" target="_blank" rel="noopener noreferrer" class="bg-cyan-600 hover:bg-cyan-500 text-white font-medium px-5 py-2 rounded-lg text-xs tv-focus">
                 Open Community Link
               </a>
-              <button onclick="promptEditCommunityUrl()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2.5 rounded-lg text-sm tv-focus">
+              <button onclick="promptEditCommunityUrl()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium px-4 py-2 rounded-lg text-xs border border-slate-700 tv-focus">
                 Configure URL
               </button>
             </div>
@@ -327,13 +336,15 @@
       </div>
 
       <!-- Tab: Settings & Import -->
-      <div id="section-settings" class="tab-content hidden flex-1 p-8 max-w-4xl mx-auto w-full overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
-          <h2 class="text-2xl font-bold text-white">Settings & Playlist Import</h2>
+      <div id="section-settings" class="tab-content hidden flex-1 p-6 max-w-4xl mx-auto w-full overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-6">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <span class="text-cyan-400">✦</span> Settings & Playlist Import
+          </h2>
 
           <!-- M3U Import Form -->
-          <div class="p-5 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
-            <h3 class="text-md font-semibold text-white">Import M3U / M3U8 Playlist</h3>
+          <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
+            <h3 class="text-sm font-semibold text-white">Import M3U / M3U8 Playlist</h3>
             <textarea id="m3u-import-text" rows="4" placeholder="#EXTM3U&#10;#EXTINF:-1 tvg-id=&quot;espn&quot; group-title=&quot;Sports&quot;,ESPN HD&#10;https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs font-mono text-white focus:outline-none focus:border-cyan-500 tv-focus"></textarea>
             <button onclick="importM3u()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-medium px-4 py-2 rounded-lg text-xs tv-focus">
               Parse & Load M3U
@@ -341,8 +352,8 @@
           </div>
 
           <!-- Xtream Login Form -->
-          <div class="p-5 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
-            <h3 class="text-md font-semibold text-white">Xtream Codes Credentials (Server, User, Pass)</h3>
+          <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
+            <h3 class="text-sm font-semibold text-white">Xtream Codes Credentials (Server, User, Pass)</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
               <input type="text" id="xtream-server" value="http://127.0.0.1:43128" placeholder="http://server.com:8080" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white tv-focus">
               <input type="text" id="xtream-user" value="travis_singletary" placeholder="Username" class="bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white tv-focus">
@@ -354,8 +365,8 @@
           </div>
 
           <!-- AI Provider Settings -->
-          <div class="p-5 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
-            <h3 class="text-md font-semibold text-white">AI Assist Provider Configuration</h3>
+          <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
+            <h3 class="text-sm font-semibold text-white">AI Assist Provider Configuration</h3>
             <p class="text-xs text-slate-400">Pluggable backend: Use the built-in offline mock or configure any OpenAI-compatible endpoint (OpenAI, Ollama, Groq, LocalAI). No keys are committed.</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
@@ -367,7 +378,7 @@
                 <input type="text" id="ai-model-name" value="gpt-4o-mini" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white tv-focus">
               </div>
             </div>
-            <button onclick="saveAiSettings()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium px-4 py-2 rounded-lg text-xs tv-focus">
+            <button onclick="saveAiSettings()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium px-4 py-2 rounded-lg text-xs border border-slate-700 tv-focus">
               Save AI Settings
             </button>
           </div>
@@ -425,15 +436,15 @@
       const spContainer = document.getElementById('sports-content-container');
       if (sportsPicksEnabled) {
         spBtn.textContent = 'ACTIVE';
-        spBtn.className = 'px-3 py-1 rounded text-xs font-bold bg-emerald-900 text-emerald-300 border border-emerald-700';
+        spBtn.className = 'px-3 py-1 rounded text-xs font-mono font-medium bg-cyan-950 text-cyan-300 border border-cyan-800/60 tv-focus';
         spPill.textContent = 'ACTIVE';
-        spPill.className = 'text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/60';
+        spPill.className = 'text-[10px] px-1.5 py-0.5 rounded font-mono bg-cyan-950 text-cyan-400 border border-cyan-800/60';
         spContainer.classList.remove('opacity-50', 'pointer-events-none');
       } else {
-        spBtn.textContent = 'OFF';
-        spBtn.className = 'px-3 py-1 rounded text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700';
+        spBtn.textContent = 'DISABLED';
+        spBtn.className = 'px-3 py-1 rounded text-xs font-mono font-medium bg-slate-800 text-slate-400 border border-slate-700 tv-focus';
         spPill.textContent = 'FLAGGED';
-        spPill.className = 'text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700';
+        spPill.className = 'text-[10px] px-1.5 py-0.5 rounded font-mono bg-slate-800 text-slate-400 border border-slate-700';
         spContainer.classList.add('opacity-50', 'pointer-events-none');
       }
 
@@ -442,15 +453,15 @@
       const comArea = document.getElementById('community-view-area');
       if (communityEnabled) {
         comBtn.textContent = 'ACTIVE';
-        comBtn.className = 'px-3 py-1 rounded text-xs font-bold bg-indigo-900 text-indigo-300 border border-indigo-700';
+        comBtn.className = 'px-3 py-1 rounded text-xs font-mono font-medium bg-cyan-950 text-cyan-300 border border-cyan-800/60 tv-focus';
         comPill.textContent = 'ACTIVE';
-        comPill.className = 'text-[10px] px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-400 border border-indigo-800/60';
+        comPill.className = 'text-[10px] px-1.5 py-0.5 rounded font-mono bg-cyan-950 text-cyan-400 border border-cyan-800/60';
         comArea.classList.remove('opacity-50', 'pointer-events-none');
       } else {
-        comBtn.textContent = 'OFF';
-        comBtn.className = 'px-3 py-1 rounded text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700';
+        comBtn.textContent = 'DISABLED';
+        comBtn.className = 'px-3 py-1 rounded text-xs font-mono font-medium bg-slate-800 text-slate-400 border border-slate-700 tv-focus';
         comPill.textContent = 'FLAGGED';
-        comPill.className = 'text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700';
+        comPill.className = 'text-[10px] px-1.5 py-0.5 rounded font-mono bg-slate-800 text-slate-400 border border-slate-700';
         comArea.classList.add('opacity-50', 'pointer-events-none');
       }
     }
@@ -601,8 +612,8 @@
       
       // User message
       const userBubble = document.createElement('div');
-      userBubble.className = "bg-cyan-950/40 p-3 rounded-xl border border-cyan-800/40 text-sm text-cyan-200";
-      userBubble.innerHTML = `<span class="font-semibold text-cyan-400">You:</span> ${query}`;
+      userBubble.className = "bg-slate-950 p-3 rounded-xl border border-slate-800 text-sm text-cyan-300";
+      userBubble.innerHTML = `<span class="font-semibold text-white">You:</span> ${query}`;
       history.appendChild(userBubble);
       history.scrollTop = history.scrollHeight;
 
@@ -635,7 +646,7 @@
         }
 
         botBubble.innerHTML = `
-          <p class="text-cyan-300 font-semibold">SKYRAS AI:</p>
+          <p class="text-cyan-400 font-semibold">SKYRAS AI:</p>
           <p class="text-slate-200">${data.reply}</p>
           ${matchesHtml}
         `;
@@ -692,10 +703,10 @@
 
     function testAffiliateLink(partner) {
       if (!sportsPicksEnabled) {
-        alert("Feature Flag is OFF. Enable the feature flag to test outbound affiliate clicks.");
+        alert("Feature Flag is DISABLED. Enable the feature flag to test outbound affiliate clicks.");
         return;
       }
-      alert(`Outbound affiliate redirect stub: Opening regulated partner (${partner}) with tag 'skyras_media'. Note: 21+ age-gate and geofence TODO required before production.`);
+      alert(`Outbound affiliate redirect stub: Opening regulated partner (${partner}) with tag 'skyras_media'. Note: 21+ age-gate and geofence verification required before production.`);
     }
 
     async function importM3u() {
