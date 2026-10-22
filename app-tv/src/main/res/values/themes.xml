@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.SkyrasTv" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/skyras_black</item>
+        <item name="android:colorBackground">@color/skyras_black</item>
+        <item name="android:statusBarColor">@color/skyras_black</item>
+        <item name="android:navigationBarColor">@color/skyras_black</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="colorPrimary">@color/skyras_cyan</item>
+        <item name="colorAccent">@color/skyras_accent</item>
+        <item name="android:textColor">@color/skyras_text</item>
+    </style>
+</resources>

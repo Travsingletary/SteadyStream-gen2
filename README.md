@@ -56,8 +56,25 @@ skyras-tv/
 ## Build & Test Instructions
 
 ### Prerequisites
-- JDK 21+
+- JDK 17+ (JDK 21 is fine)
+- Android SDK (compile SDK 35) for the Fire TV APK
 - Node.js v18+ (for web companion preview)
+
+### Build a Fire Stick / Android TV APK
+The installable app lives in `:app-tv`. There is no production keystore in this repo, so the release APK is signed with the debug key for sideload.
+
+```bash
+echo "sdk.dir=$ANDROID_HOME" > local.properties   # gitignored
+./gradlew :app-tv:assembleRelease
+```
+
+APK path:
+
+```
+app-tv/build/outputs/apk/release/app-tv-release.apk
+```
+
+Sideload on Fire TV with ADB or AFTVnews Downloader after you host that APK on a public HTTPS URL.
 
 ### 1. Run Kotlin Multi-Module Unit Tests
 Execute the complete test suite across all subprojects:

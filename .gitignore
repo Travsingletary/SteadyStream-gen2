@@ -6,3 +6,9 @@ build/
 .DS_Store
 *.log
 .playwright-mcp/
+local.properties
+*.apk
+*.ap_
+*.aab
+app-tv/release/
+app-tv/debug/

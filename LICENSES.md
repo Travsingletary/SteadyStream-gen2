@@ -14,7 +14,9 @@ All third-party libraries integrated into SKYRAS TV are evaluated to ensure they
 | **OkHttp** | `com.squareup.okhttp3:okhttp` | 4.12.0 | Apache-2.0 | HTTP client for Xtream Codes and LLM endpoint communication. |
 | **MockWebServer** | `com.squareup.okhttp3:mockwebserver` | 4.12.0 | Apache-2.0 | Test-only local HTTP server for hermetic unit testing. |
 | **JUnit 5 Jupiter** | `org.junit.jupiter:junit-jupiter` | 5.11.2 | EPL-2.0 / Apache-2.0 | Industry standard test runner for multi-module Kotlin test suites. |
-| **AndroidX Media3 / ExoPlayer** | `androidx.media3:media3-exoplayer` | 1.4.1+ (Target) | Apache-2.0 | Target core playback engine for HLS, DASH, and TS streams on Android TV / Fire TV. |
+| **AndroidX Media3 / ExoPlayer** | `androidx.media3:media3-exoplayer` | 1.4.1 | Apache-2.0 | Fire TV / Android TV HLS playback engine. |
+| **AndroidX Media3 UI** | `androidx.media3:media3-ui` | 1.4.1 | Apache-2.0 | Fullscreen `PlayerView` surface for the TV shell. |
+| **AndroidX AppCompat** | `androidx.appcompat:appcompat` | 1.7.0 | Apache-2.0 | Activity theme and TV-safe window chrome. |
 | **Tailwind CSS** | Standalone CDN bundle | 3.x | MIT | Permissive styling framework for web companion and remote emulator. |
 | **Hls.js** | Standalone CDN bundle | 1.x | Apache-2.0 | HLS stream playback engine for companion web preview. |
 

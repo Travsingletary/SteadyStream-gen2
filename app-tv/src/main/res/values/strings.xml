@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SKYRAS TV</string>
+    <string name="now_label">NOW</string>
+    <string name="next_label">NEXT</string>
+    <string name="channels_title">CHANNELS</string>
+    <string name="menu_ai">AI Assist</string>
+    <string name="menu_bet">Bet</string>
+    <string name="menu_community">Community</string>
+    <string name="hint_ok">OK Channels</string>
+    <string name="hint_menu">MENU Features</string>
+    <string name="hint_ch">CH+/- Zap</string>
+    <string name="demo_badge">DEMO HLS</string>
+</resources>

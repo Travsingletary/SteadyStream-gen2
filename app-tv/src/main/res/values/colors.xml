@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="skyras_black">#030712</color>
+    <color name="skyras_panel">#E00B1220</color>
+    <color name="skyras_panel_solid">#0F172A</color>
+    <color name="skyras_cyan">#38BDF8</color>
+    <color name="skyras_cyan_dim">#0E7490</color>
+    <color name="skyras_text">#F3F4F6</color>
+    <color name="skyras_muted">#94A3B8</color>
+    <color name="skyras_focus">#1E293B</color>
+    <color name="skyras_accent">#22D3EE</color>
+    <color name="skyras_overlay_edge">#334155</color>
+</resources>
