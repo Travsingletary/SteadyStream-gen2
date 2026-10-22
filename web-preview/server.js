@@ -290,6 +290,24 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Serve zip download
+  if (urlObj.pathname === '/download/SteadyStream-gen2.zip' || urlObj.pathname === '/SteadyStream-gen2.zip') {
+    const zipPath = path.join(__dirname, 'SteadyStream-gen2.zip');
+    fs.readFile(zipPath, (err, data) => {
+      if (err) {
+        res.writeHead(404);
+        res.end("ZIP file not found");
+        return;
+      }
+      res.writeHead(200, {
+        'Content-Type': 'application/zip',
+        'Content-Disposition': 'attachment; filename="SteadyStream-gen2.zip"'
+      });
+      res.end(data);
+    });
+    return;
+  }
+
   // Serve static UI
   if (urlObj.pathname === '/' || urlObj.pathname === '/index.html') {
     const htmlPath = path.join(__dirname, 'index.html');
