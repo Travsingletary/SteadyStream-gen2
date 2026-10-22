@@ -8,6 +8,7 @@ build/
 .playwright-mcp/
 local.properties
 *.apk
+!docs/*.apk
 *.ap_
 *.aab
 app-tv/release/

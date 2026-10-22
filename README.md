@@ -74,7 +74,15 @@ APK path:
 app-tv/build/outputs/apk/release/app-tv-release.apk
 ```
 
-Sideload on Fire TV with ADB or AFTVnews Downloader after you host that APK on a public HTTPS URL.
+Sideload on Fire TV with ADB or AFTVnews Downloader using a public HTTPS file URL (not an HTML page).
+
+Hosted release APK (GitHub Pages / docs):
+
+- Landing page: https://travsingletary.github.io/SteadyStream-gen2/
+- Direct APK (Downloader): https://travsingletary.github.io/SteadyStream-gen2/skyras-tv-1.0.0-release.apk
+- Raw GitHub fallback: https://github.com/Travsingletary/SteadyStream-gen2/raw/main/docs/skyras-tv-1.0.0-release.apk
+
+If Pages is not enabled yet: repo **Settings → Pages → Deploy from a branch → `main` / `/docs` → Save**.
 
 ### 1. Run Kotlin Multi-Module Unit Tests
 Execute the complete test suite across all subprojects:
