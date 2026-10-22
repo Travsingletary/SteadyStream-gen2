@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sign_in_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/skyras_black"
+    android:keepScreenOn="true">
+
+    <LinearLayout
+        android:layout_width="480dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/skyras_panel_solid"
+        android:orientation="vertical"
+        android:padding="28dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sign_in_title"
+            android:textColor="@color/skyras_cyan"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/sign_in_subtitle"
+            android:textColor="@color/skyras_muted"
+            android:textSize="13sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="@string/label_username"
+            android:textColor="@color/skyras_muted"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/input_username"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/tv_field"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:hint="@string/hint_username"
+            android:imeOptions="actionNext"
+            android:inputType="text"
+            android:nextFocusDown="@id/input_password"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:singleLine="true"
+            android:textColor="@color/skyras_text"
+            android:textColorHint="@color/skyras_muted" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/label_password"
+            android:textColor="@color/skyras_muted"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/input_password"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/tv_field"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:hint="@string/hint_password"
+            android:imeOptions="actionNext"
+            android:inputType="textPassword"
+            android:nextFocusDown="@id/input_m3u"
+            android:nextFocusUp="@id/input_username"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:singleLine="true"
+            android:textColor="@color/skyras_text"
+            android:textColorHint="@color/skyras_muted" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/label_m3u"
+            android:textColor="@color/skyras_muted"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/input_m3u"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/tv_field"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:hint="@string/hint_m3u"
+            android:imeOptions="actionDone"
+            android:inputType="textUri"
+            android:nextFocusDown="@id/button_sign_in"
+            android:nextFocusUp="@id/input_password"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:singleLine="true"
+            android:textColor="@color/skyras_text"
+            android:textColorHint="@color/skyras_muted" />
+
+        <TextView
+            android:id="@+id/sign_in_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="#FCA5A5"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/button_sign_in"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/tv_button"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:nextFocusDown="@id/button_demo"
+            android:nextFocusUp="@id/input_m3u"
+            android:text="@string/action_sign_in"
+            android:textAllCaps="false"
+            android:textColor="@color/skyras_text"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/button_demo"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/tv_button_secondary"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:nextFocusUp="@id/button_sign_in"
+            android:text="@string/action_demo"
+            android:textAllCaps="false"
+            android:textColor="@color/skyras_muted"
+            android:textSize="13sp" />
+    </LinearLayout>
+</FrameLayout>

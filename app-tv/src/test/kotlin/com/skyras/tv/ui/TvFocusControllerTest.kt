@@ -52,6 +52,11 @@ class TvFocusControllerTest {
         assertEquals("SKYRAS Live 2", selected?.name)
         assertEquals(PlayerPlaybackState.PLAYING, controller.playerCore.state)
 
+        controller.focusChannelIndex(0)
+        assertEquals(0, controller.navState.value.focusedChannelIndex)
+        controller.focusChannelIndex(99)
+        assertEquals(2, controller.navState.value.focusedChannelIndex)
+
         // Feature flags off -> Sports Picks & Community absent from visible sections
         val sectionsNoFlags = controller.getVisibleSections()
         assertFalse(sectionsNoFlags.contains(TvScreenSection.SPORTS_PICKS))

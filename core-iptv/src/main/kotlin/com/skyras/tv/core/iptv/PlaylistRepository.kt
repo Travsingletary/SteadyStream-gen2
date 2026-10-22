@@ -27,6 +27,13 @@ class PlaylistRepository {
         }
     }
 
+    fun restoreFavorites(ids: Set<String>) {
+        _favoriteIds.value = ids
+        _channels.value = _channels.value.map { channel ->
+            channel.copy(isFavorite = ids.contains(channel.id))
+        }
+    }
+
     fun toggleFavorite(channelId: String) {
         val currentFavs = _favoriteIds.value.toMutableSet()
         if (currentFavs.contains(channelId)) {

@@ -31,6 +31,7 @@ skyras-tv/
 ├── core-model/                 # Pure Kotlin domain data classes (Channel, EpgProgram, VodItem, SeriesItem)
 ├── core-iptv/                  # M3U/M3U8 parser, XMLTV parser, and in-memory PlaylistRepository
 ├── core-xtream/                # Xtream Codes API client (Live, VOD, Series, Player API authentication)
+├── core-prefs/                 # Mock sign-in + UserPreferencesRepository (local + optional Supabase REST)
 ├── feature-ai-assist/          # AI Assist Engine, Pluggable LlmProvider, MockLlmProvider & OpenAI-compatible client
 ├── feature-sports-picks/       # Affiliate stub module (DraftKings/FanDuel referral links, feature-flagged, geo/age-gate TODO)
 ├── feature-community/          # Community slot placeholder (nav entry, route, configurable deep-link URL, feature-flagged)
@@ -42,9 +43,12 @@ skyras-tv/
 
 ## 3. Data Flow & Subsystem Interaction
 
+### A0. Sign-in and preference persistence
+First launch shows a single TV sign-in screen. `MockCredentialAuth` accepts username + password (length ≥ 3) and an optional M3U URL. There is no production identity provider. On success, `SessionStore` keeps the username locally and `UserPreferencesRepository` writes `user_preferences` to SharedPreferences, plus Supabase PostgREST when `BuildConfig` is not using placeholders.
+
 ### A. Playlist & Xtream Codes Ingestion Flow
 ```
-[ User Input (M3U URL/File or Xtream Creds) ]
+[ Sign-in (username / password / optional M3U URL) ]
                    │
                    ▼
      ┌───────────────────────────┐

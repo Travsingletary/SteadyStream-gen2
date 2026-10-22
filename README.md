@@ -32,6 +32,11 @@ SKYRAS TV is an original IPTV client engineered for Android TV, Amazon Fire TV, 
 7. **D-Pad TV Navigation & Companion Player**:
    - 10-foot UI focus controller supporting Arrow Keys (Up/Down/Select) and TV remote navigation.
    - Web companion simulator serving HLS playback on port 43128 with live mock Xtream endpoints.
+8. **Simple TV sign-in + saved preferences**:
+   - First launch is a single sign-in screen (username, password, optional M3U URL). Not a TiviMate settings maze.
+   - Mock credential check only (no production auth server). Known username `demo` (or the small Demo lineup button) uses the built-in HLS catalog.
+   - After success the M3U is parsed with existing `M3uParser` / `PlaylistRepository` and live TV starts.
+   - Preferences (`user_preferences`: username, m3u_url, prefs JSON, updated_at) persist locally and, when keys are set, via Supabase REST.
 
 ---
 
@@ -42,6 +47,7 @@ skyras-tv/
 ├── core-model/                 # Domain entities (Channel, EpgProgram, VodItem, SeriesItem)
 ├── core-iptv/                  # M3U/M3U8 & XMLTV Parsers, PlaylistRepository
 ├── core-xtream/                # Xtream Codes Client & DTOs
+├── core-prefs/                 # Mock sign-in, UserPreferences repository, Supabase REST client
 ├── feature-ai-assist/          # AI Assist Engine, Pluggable LlmProvider & Mock Provider
 ├── feature-sports-picks/       # Affiliate linkout stub with Geo/Age-gate checks
 ├── feature-community/          # Community slot placeholder & route controller
@@ -84,6 +90,39 @@ Hosted release APK (GitHub Pages / docs):
 
 If Pages is not enabled yet: repo **Settings → Pages → Deploy from a branch → `main` / `/docs` → Save**.
 
+### Sign-in (first launch)
+
+The Leanback launcher opens `SignInActivity`, not live TV.
+
+| Field | Required | Notes |
+| :--- | :--- | :--- |
+| Username | yes | Any non-empty name. `demo` maps to the built-in HLS catalog. |
+| Password | yes | Mock check only: length ≥ 3. Not verified against a real IdP. |
+| Playlist URL | optional | If set (`http`/`https` M3U), it is fetched and parsed. If omitted, demo HLS is used. |
+
+D-pad: Username → Password → Playlist URL → **Sign in** → Demo lineup. All fields and both buttons are focusable.
+
+Subsequent launches reuse the local session until **Sign out** (Menu on live TV).
+
+### Supabase persistence (optional)
+
+The APK **builds and runs with placeholder keys**. There is no live Supabase in this repo (no secrets committed).
+
+1. Create a Supabase project.
+2. Run `supabase/migrations/001_user_preferences.sql` in the SQL editor.
+3. Copy `local.properties.example` into `local.properties` (or keep your existing `sdk.dir` line) and fill:
+
+```
+supabase.url=https://YOUR_PROJECT.supabase.co
+supabase.anon.key=YOUR_SUPABASE_ANON_KEY
+```
+
+Those values are copied into `BuildConfig.SUPABASE_URL` and `BuildConfig.SUPABASE_ANON_KEY` at compile time (`app-tv/build.gradle.kts`). You can also set env vars `SUPABASE_URL` and `SUPABASE_ANON_KEY` before Gradle. **Never put the `service_role` key in the app.**
+
+Until those placeholders are replaced, `PreferenceServices` uses SharedPreferences only. When configured, `SupabaseUserPreferencesClient` upserts the same row over PostgREST (`/rest/v1/user_preferences`).
+
+Table `user_preferences`: `username` (pk), `m3u_url`, `prefs` jsonb (favorites, last channel), `updated_at`.
+
 ### 1. Run Kotlin Multi-Module Unit Tests
 Execute the complete test suite across all subprojects:
 ```bash
@@ -97,6 +136,7 @@ All subprojects include hermetic unit tests:
 - `:feature-sports-picks:test` -> Affiliate URL generation, feature-flag enforcement, geo-gate/age-gate checks.
 - `:feature-community:test` -> Community route state and configurable target URL.
 - `:app-tv:test` -> TV Focus Controller, D-Pad navigation, and channel selection.
+- `:core-prefs:test` -> mock sign-in rules, local preference store, Supabase REST client against MockWebServer.
 
 ### 2. Run the Interactive TV Web Companion
 Launch the companion server:

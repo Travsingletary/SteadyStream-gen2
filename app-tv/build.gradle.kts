@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -14,6 +16,33 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
+
+        val localProperties = Properties()
+        val localFile = rootProject.file("local.properties")
+        if (localFile.exists()) {
+            localFile.inputStream().use { localProperties.load(it) }
+        }
+        fun quotedProp(key: String, fallback: String): String {
+            val fromEnv = System.getenv(key.uppercase().replace('.', '_'))
+            val fromFile = localProperties.getProperty(key)
+            val raw = (fromEnv?.takeIf { it.isNotBlank() }
+                ?: fromFile?.takeIf { it.isNotBlank() }
+                ?: fallback)
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+            return "\"$raw\""
+        }
+        // Travis: set supabase.url and supabase.anon.key in local.properties (gitignored).
+        buildConfigField(
+            "String",
+            "SUPABASE_URL",
+            quotedProp("supabase.url", "https://YOUR_PROJECT.supabase.co")
+        )
+        buildConfigField(
+            "String",
+            "SUPABASE_ANON_KEY",
+            quotedProp("supabase.anon.key", "YOUR_SUPABASE_ANON_KEY")
+        )
     }
 
     buildTypes {
@@ -35,6 +64,7 @@ android {
 
     buildFeatures {
         viewBinding = false
+        buildConfig = true
     }
 
     lint {
@@ -53,6 +83,7 @@ dependencies {
     implementation(project(":core-model"))
     implementation(project(":core-iptv"))
     implementation(project(":core-xtream"))
+    implementation(project(":core-prefs"))
     implementation(project(":feature-ai-assist"))
     implementation(project(":feature-sports-picks"))
     implementation(project(":feature-community"))

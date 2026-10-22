@@ -10,10 +10,17 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.media3.ui.PlayerView
+import android.content.Intent
 import com.skyras.tv.core.iptv.PlaylistRepository
 import com.skyras.tv.core.model.Channel
 import com.skyras.tv.core.model.EpgProgram
+import com.skyras.tv.core.prefs.UserPreferencesRecord
+import com.skyras.tv.core.prefs.UserPreferencesRepository
+import com.skyras.tv.core.prefs.UserPrefsPayload
 import com.skyras.tv.demo.DemoCatalog
+import com.skyras.tv.playlist.PlaylistLoader
+import com.skyras.tv.prefs.PreferenceServices
+import com.skyras.tv.prefs.SessionStore
 import com.skyras.tv.feature.ai.AiAssistEngine
 import com.skyras.tv.feature.ai.MockLlmProvider
 import com.skyras.tv.feature.community.CommunityConfig
@@ -38,6 +45,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var repository: PlaylistRepository
     private lateinit var controller: TvFocusController
     private lateinit var player: Media3SkyrasPlayer
+    private lateinit var session: SessionStore
+    private lateinit var prefsRepo: UserPreferencesRepository
 
     private lateinit var playerView: PlayerView
     private lateinit var channelOverlay: View
@@ -50,6 +59,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var menuAi: TextView
     private lateinit var menuBet: TextView
     private lateinit var menuCommunity: TextView
+    private lateinit var menuSignOut: TextView
     private lateinit var featurePanel: View
     private lateinit var featurePanelTitle: TextView
     private lateinit var featurePanelBody: TextView
@@ -74,13 +84,20 @@ class MainActivity : AppCompatActivity() {
         menuAi = findViewById(R.id.menu_ai)
         menuBet = findViewById(R.id.menu_bet)
         menuCommunity = findViewById(R.id.menu_community)
+        menuSignOut = findViewById(R.id.menu_sign_out)
         featurePanel = findViewById(R.id.feature_panel)
         featurePanelTitle = findViewById(R.id.feature_panel_title)
         featurePanelBody = findViewById(R.id.feature_panel_body)
 
+        session = SessionStore(this)
+        if (!session.isSignedIn || session.username.isBlank()) {
+            startActivity(Intent(this, SignInActivity::class.java))
+            finish()
+            return
+        }
+        prefsRepo = PreferenceServices.repository(this)
+
         repository = PlaylistRepository()
-        repository.loadChannels(DemoCatalog.channels())
-        repository.loadEpg(DemoCatalog.dummyEpg())
 
         val aiEngine = AiAssistEngine(MockLlmProvider(), repository)
         val sportsSlot = SportsPicksAffiliateSlot(SportsPicksConfig(isEnabled = true))
@@ -96,19 +113,27 @@ class MainActivity : AppCompatActivity() {
 
         playerView.player = player.exoPlayer
         renderChannelList()
-        tuneCurrent()
-        showBannerTemporarily()
+        loadUserLineup()
+    }
+
+    override fun onPause() {
+        persistPreferences()
+        super.onPause()
     }
 
     override fun onStop() {
-        player.pause()
+        if (::player.isInitialized) {
+            player.pause()
+        }
         super.onStop()
     }
 
     override fun onDestroy() {
         hideBannerHandler.removeCallbacksAndMessages(null)
         uiScope.cancel()
-        player.release()
+        if (::player.isInitialized) {
+            player.release()
+        }
         super.onDestroy()
     }
 
@@ -161,7 +186,7 @@ class MainActivity : AppCompatActivity() {
             }
             KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_CHANNEL_DOWN -> {
                 if (menuVisible) {
-                    menuIndex = (menuIndex + 1).coerceAtMost(2)
+                    menuIndex = (menuIndex + 1).coerceAtMost(3)
                     highlightMenu()
                     return true
                 }
@@ -259,7 +284,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun highlightMenu() {
-        val items = listOf(menuAi, menuBet, menuCommunity)
+        val items = listOf(menuAi, menuBet, menuCommunity, menuSignOut)
         items.forEachIndexed { index, view ->
             view.setBackgroundColor(if (index == menuIndex) 0xCC1E293B.toInt() else 0x00000000)
         }
@@ -270,7 +295,8 @@ class MainActivity : AppCompatActivity() {
         when (menuIndex) {
             0 -> openAiAssist()
             1 -> openBet()
-            else -> openCommunity()
+            2 -> openCommunity()
+            else -> signOut()
         }
     }
 
@@ -344,5 +370,57 @@ class MainActivity : AppCompatActivity() {
                 nowNextBanner.visibility = View.GONE
             }
         }, 4500)
+    }
+
+    private fun loadUserLineup() {
+        uiScope.launch {
+            val stored = prefsRepo.load(session.username)
+            if (session.useDemoCatalog || session.m3uUrl.isNullOrBlank()) {
+                repository.loadChannels(DemoCatalog.channels())
+                repository.loadEpg(DemoCatalog.dummyEpg())
+            } else {
+                val fetched = runCatching { PlaylistLoader().fetchChannels(session.m3uUrl.orEmpty()) }
+                if (fetched.isSuccess) {
+                    repository.loadChannels(fetched.getOrThrow())
+                } else {
+                    repository.loadChannels(DemoCatalog.channels())
+                    repository.loadEpg(DemoCatalog.dummyEpg())
+                    bannerNow.text = fetched.exceptionOrNull()?.message ?: "Playlist failed; demo lineup"
+                }
+            }
+            stored?.prefs?.favoriteIds?.let { repository.restoreFavorites(it.toSet()) }
+            val lastIndex = stored?.prefs?.lastChannelIndex ?: 0
+            val lastId = stored?.prefs?.lastChannelId
+            val byId = lastId?.let { id -> repository.channels.value.indexOfFirst { it.id == id } } ?: -1
+            controller.focusChannelIndex(if (byId >= 0) byId else lastIndex)
+            renderChannelList()
+            tuneCurrent()
+            showBannerTemporarily()
+        }
+    }
+
+    private fun persistPreferences() {
+        if (!::session.isInitialized || !session.isSignedIn) return
+        val channel = currentChannel()
+        val record = UserPreferencesRecord(
+            username = session.username,
+            m3uUrl = session.m3uUrl,
+            prefs = UserPrefsPayload(
+                favoriteIds = repository.favoriteIds.value.toList(),
+                lastChannelId = channel?.id,
+                lastChannelIndex = controller.navState.value.focusedChannelIndex
+            ),
+            updatedAtEpochMillis = System.currentTimeMillis()
+        )
+        uiScope.launch {
+            prefsRepo.save(record)
+        }
+    }
+
+    private fun signOut() {
+        persistPreferences()
+        session.signOut()
+        startActivity(Intent(this, SignInActivity::class.java))
+        finish()
     }
 }

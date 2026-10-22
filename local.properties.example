@@ -1,0 +1,7 @@
+# Copy to local.properties (already gitignored) or keep your existing sdk.dir line.
+sdk.dir=/home/ubuntu/android-sdk
+
+# Supabase (anon key only — never commit the service_role key)
+# Fill these, then rebuild :app-tv so BuildConfig picks them up.
+supabase.url=https://YOUR_PROJECT.supabase.co
+supabase.anon.key=YOUR_SUPABASE_ANON_KEY

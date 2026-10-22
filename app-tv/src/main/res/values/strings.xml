@@ -11,4 +11,17 @@
     <string name="hint_menu">MENU Features</string>
     <string name="hint_ch">CH+/- Zap</string>
     <string name="demo_badge">DEMO HLS</string>
+    <string name="menu_sign_out">Sign out</string>
+    <string name="sign_in_title">SKYRAS TV</string>
+    <string name="sign_in_subtitle">Enter your playlist login, then watch live TV.</string>
+    <string name="label_username">Username</string>
+    <string name="label_password">Password</string>
+    <string name="label_m3u">Playlist URL (optional)</string>
+    <string name="hint_username">username</string>
+    <string name="hint_password">password</string>
+    <string name="hint_m3u">https://…/playlist.m3u</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_demo">Demo lineup</string>
+    <string name="sign_in_loading">Loading playlist…</string>
+    <string name="sign_in_playlist_failed">Could not load that playlist URL</string>
 </resources>

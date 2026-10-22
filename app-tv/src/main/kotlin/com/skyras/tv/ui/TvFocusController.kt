@@ -70,6 +70,17 @@ class TvFocusController(
         }
     }
 
+    fun focusChannelIndex(index: Int) {
+        val channelCount = playlistRepository.channels.value.size
+        if (channelCount <= 0) {
+            _navState.value = _navState.value.copy(focusedChannelIndex = 0)
+            return
+        }
+        _navState.value = _navState.value.copy(
+            focusedChannelIndex = index.coerceIn(0, channelCount - 1)
+        )
+    }
+
     fun onDpadSelect(): Channel? {
         val channels = playlistRepository.channels.value
         val currentIndex = _navState.value.focusedChannelIndex
